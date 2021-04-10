@@ -1,53 +1,34 @@
-import yfinace 
-import pandas as pd
-from datetime import datetime, timedelta
+from stock import Stock
 
 class DataLoarder():
     
-    def get_data(self, period, tickers_list):
-        data_open = pd.DataFrame(yfinance.Ticker(tickers_list[0]).history(period = period).Open)
-        data_open.columns = [tickers_list[0]]
+    def __init__(self, tickers = []):
 
-        data_high = pd.DataFrame(yfinance.Ticker(tickers_list[0]).history(period = period).High)
-        data_high.columns = [tickers_list[0]]
-    
-        data_low = pd.DataFrame(yfinance.Ticker(tickers_list[0]).history(period = period).Low)
-        data_low.columns = [tickers_list[0]]
+        self.tickers = []
+        self.stocks = {}
+        self.add_tickers(tickers)
         
-        data_close = pd.DataFrame(yfinance.Ticker(tickers_list[0]).history(period = period).Close)
-        data_close.columns = [tickers_list[0]]
+    def load(self, ticker, start_date, end_date):
 
-        data_volume = pd.DataFrame(yfinance.Ticker(tickers_list[0]).history(period = period).Volume)
-        data_volume.columns = [tickers_list[0]]
+        if not ticker in self.tickers:
 
-        for ticker in tickers_list[1:]:
+            print('[DATALOADER] Ticker not found: Creating new one ...')
+            self.add_tickers([ticker])
 
-            ticker_open = pd.DataFrame(yfinance.Ticker(ticker).history(period = period).Open)
-            ticker_open.columns = [ticker]
+        return self.stocks[ticker].load(start_date,end_date)
+    
+    def add_tickers(self, tickers):
 
-            ticker_high = pd.DataFrame(yfinance.Ticker(ticker).history(period = period).High)
-            ticker_high.columns = [ticker]
+        for ticker in tickers:
 
-            ticker_low = pd.DataFrame(yfinance.Ticker(ticker).history(period = period).Low)
-            ticker_low.columns = [ticker]
+            self.tickers.append(ticker)
+            stock = Stock(ticker)
+            self.stocks[ticker] = stock
 
-            ticker_close = pd.DataFrame(yfinance.Ticker(ticker).history(period = period).Close)
-            ticker_close.columns = [ticker]
+        
 
-            ticker_volume = pd.DataFrame(yfinance.Ticker(ticker).history(period = period).Volume)
-            ticker_volume.columns = [ticker]
-            
-            if len(ticker_close.index) != 0:
-                data_open = data_open.join(ticker_open, how = 'outer')
-                data_high = data_high.join(ticker_high, how = 'outer')
-                data_low = data_low.join(ticker_low, how = 'outer') 
-                data_close = data_close.join(ticker_close, how = 'outer')
-                data_volume = data_volume.join(ticker_volume, how = 'outer')
-            else:
-                print('Ticker not Available')
 
-        self.open_prices = data_open
-        self.high_prices = data_high
-        self.low_prices = data_low
-        self.close_prices = data_close
-        self.volume = data_volume
+    
+
+
+
