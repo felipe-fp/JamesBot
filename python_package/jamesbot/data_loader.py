@@ -1,6 +1,6 @@
-from stock import Stock
+from jamesbot.stock import Stock
 
-class DataLoarder():
+class DataLoader():
     
     def __init__(self, tickers = []):
 

@@ -8,6 +8,9 @@ class Stock():
 
         self.ticker = ticker 
         try:
+            import os
+            if not os.path.exists('./data'):
+                os.makedirs('./data')
             file = open('./data/'+ ticker + '_metadata.txt','r')
             lines = file.readlines()
             self.periods = []
