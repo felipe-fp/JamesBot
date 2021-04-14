@@ -8,16 +8,24 @@ class Stock():
 
         self.ticker = ticker 
         try:
+
+            import os
+            if not os.path.exists('./data'):
+                print('[STOCK] Creating Data folder')
+                os.makedirs('./data')
+
             file = open('./data/'+ ticker + '_metadata.txt','r')
             lines = file.readlines()
             self.periods = []
+
             for line in lines:
                 splited = line.split(' ')
                 self.periods.append([to_dat(splited[0]),to_dat(splited[1])])
+
             file.close()
 
         except FileNotFoundError:
-            print('Creating new Stock metadata for', ticker)
+            print('[STOCK] Creating new Stock metadata for', ticker)
             self.periods = []
             file = open('./data/' + ticker + '_metadata.txt','w')
             file.close()
@@ -26,9 +34,7 @@ class Stock():
         
         print('Getting data from Yahoo for',self.ticker,'...')
         ticker_info = yf.Ticker(self.ticker).history(start = to_str(start_date + timedelta(days=1)), end = to_str(end_date + timedelta(days=1)))
-        print('Saving','...')
         ticker_info.to_csv('./data/' + self.ticker +'_'+ to_str(start_date)+'_' + to_str(end_date) + '.csv')
-        print('Completed!')
 
         return ticker_info.loc[to_str(start_date):to_str(end_date)]
 
@@ -74,8 +80,6 @@ class Stock():
                 periods.append({'period':period,'concerned':True,'loaded':True})
             else:
                 periods.append({'period':period,'concerned':False,'loaded':True})
-            
-        print('[dict created]',periods)
 
         first_concerned, last_concerned, n_concerned = self.get_concerned(periods)
 
@@ -113,7 +117,6 @@ class Stock():
 
         periods = self.fill_voids(start_date, end_date)
         df = pd.DataFrame()
-        print('[LOAD1]',periods)
 
         n_concerned = 0
         for period in periods:
@@ -124,16 +127,13 @@ class Stock():
                     df = df.append(self._get_data(period['period'][0],period['period'][1]))
                 n_concerned += 1
         
-        print('n_concerned',n_concerned)
         if n_concerned > 1:
             first_concerned, last_concerned, n_concerned = self.get_concerned(periods)
             df_start = periods[first_concerned]['period'][0]
             df_end = periods[last_concerned]['period'][1]
-            print('typical', df_start, df_end)
             df.to_csv('./data/' + self.ticker +'_'+ to_str(df_start)+'_' + to_str(df_end) + '.csv')
             periods = self.delete_overlapping(periods,df_start,df_end)
             
-        print(['LOAD2'],periods)
         # Translate to official version
         self.periods = []
         
@@ -143,7 +143,6 @@ class Stock():
         self.refresh_metadata()
         
         cropped_df = df.loc[start_date : end_date]
-        print('cropped',cropped_df)
         return cropped_df
     
     
@@ -170,7 +169,7 @@ class Stock():
                 file.write(line)
             file.close()    
         except FileNotFoundError:
-            print('MetaData not found for', self.ticker)
+            print('[STOCK] MetaData not found for', self.ticker)
             file = open('./data/' + self.ticker + '_metadata.txt','w')
             for period in self.periods:
                 line = to_str(period[0])+' '+to_str(period[1])+' \n'
