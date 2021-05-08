@@ -2,9 +2,10 @@ from jamesbot.stock import Stock
 
 class DataLoader():
     
-    def __init__(self, tickers = []):
+    def __init__(self, tickers = [], source = 'yahoo'):
 
         self.tickers = []
+        self.source = source
         self.stocks = {}
         self.add_tickers(tickers)
         
@@ -22,7 +23,7 @@ class DataLoader():
         for ticker in tickers:
 
             self.tickers.append(ticker)
-            stock = Stock(ticker)
+            stock = Stock(ticker, source = self.source)
             self.stocks[ticker] = stock
 
         

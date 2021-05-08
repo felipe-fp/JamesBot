@@ -1,12 +1,15 @@
-import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
 class Stock():
 
-    def __init__(self, ticker):
+    def __init__(self, ticker, source = 'yahoo'):
 
+        # Name of the stocks ticker
         self.ticker = ticker 
+        # Source of the data: "yahoo" or "bloomberg"
+        self.source = source
+
         try:
 
             import os
@@ -32,8 +35,16 @@ class Stock():
 
     def _get_data(self, start_date, end_date):
         
-        print('Getting data from Yahoo for',self.ticker,'...')
-        ticker_info = yf.Ticker(self.ticker).history(start = to_str(start_date + timedelta(days=1)), end = to_str(end_date + timedelta(days=1)))
+        if self.source == "yahoo":
+
+            from jamesbot.yahoo_api import get_data
+            ticker_info = get_data(self.ticker, start_date, end_date)
+
+        elif self.source == "bloomberg":
+
+            from jamesbot.bloomberg_api import get_data
+            ticker_info = get_data(self.ticker, start_date, end_date)
+        
         ticker_info.to_csv('./data/' + self.ticker +'_'+ to_str(start_date)+'_' + to_str(end_date) + '.csv')
 
         return ticker_info.loc[to_str(start_date):to_str(end_date)]

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="jamesbot", 
-    version="0.1.0",
+    version="0.1.1",
     author="Faruk Hammoud, Felipe Freire Pinto",
     author_email="farukhammoud@student-cs.fr, felipe.fp@student-cs.fr",
     description="Download and Store financial data.",
@@ -16,7 +16,8 @@ setuptools.setup(
 	install_requires=[
    'pandas',
    'datetime',
-   'yfinance'
+   'yfinance',
+   'xbbg'
 	],
     classifiers=[
         "Programming Language :: Python :: 3",
